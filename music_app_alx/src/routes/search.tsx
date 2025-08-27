@@ -1,6 +1,8 @@
 import React from "react";
 import Musiccardsmall from "../components/musiccardsmall";
 import Genrecard from "../components/genrecard";
+import Searchbox from "../components/searchbox";
+import AlbumCard from "../components/albumcard";
 
 const dummydetails = [
   {
@@ -42,7 +44,11 @@ const dummygenres = [
 
 const Search = () => {
   return (
-    <div>
+    <div className="w-full h-full overflow-y-auto p-6">
+      <header className="w-full flex items-center justify-center px-6">
+        <Searchbox />
+      </header>
+
       <p className="text-white text-lg p-4 font-bold">Genres</p>
       <div className="flex flex-wrap p-4 gap-4 mb-4">
         {dummygenres.map((item, index) => (
