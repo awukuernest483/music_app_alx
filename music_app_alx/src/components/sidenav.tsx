@@ -1,33 +1,46 @@
 "use client";
 
 import { Library, Search, Settings, XIcon } from "lucide-react";
-import React, { useState } from "react";
+
 import Userheader from "./userheader";
+import { useLocation, useNavigate } from "react-router-dom";
 
 interface SidenavProps {
   onClose?: () => void;
 }
 
 export const Sidenav = ({ onClose }: SidenavProps) => {
-  const [isSelected, setIsSelected] = useState(false);
+  const navigate = useNavigate();
+  const location = useLocation();
 
   const navlinks = [
     {
       icon: <Search className="w-4 h-4 text-white" />,
       label: "Search",
-      isActive: isSelected,
+      path: "/search",
+      isActive: location.pathname === "/search",
     },
     {
       icon: <Library className="w-4 h-4 text-white" />,
       label: "Library",
-      isActive: isSelected,
+      path: "/library",
+      isActive: location.pathname === "/library",
     },
     {
       icon: <Settings className="w-4 h-4 text-white" />,
       label: "Settings",
-      isActive: isSelected,
+      path: "/settings",
+      isActive: location.pathname === "/settings",
     },
   ];
+
+  const handleNavClick = (path: string) => {
+    navigate(path);
+    // Close mobile menu after navigation
+    if (onClose) {
+      onClose();
+    }
+  };
 
   return (
     <nav className="min-w-xs h-full bg-[#1C2426] relative">
@@ -52,9 +65,9 @@ export const Sidenav = ({ onClose }: SidenavProps) => {
                 <Userheader name="Ernest Junior" />
                 {navlinks.map((item, index) => (
                   <div
-                    onClick={() => setIsSelected(true)}
+                    onClick={() => handleNavClick(item.path)}
                     key={index}
-                    className={`w-full flex-row flex justify-start gap-2 px-2.5 py-3 rounded-md hover:bg-[#9CB2BA] cursor-pointer ${
+                    className={`w-full flex-row flex justify-start gap-2 px-2.5 py-3 rounded-md hover:bg-[#9CB2BA] cursor-pointer transition-colors ${
                       item.isActive ? "bg-[#9CB2BA]" : "bg-transparent"
                     }`}
                   >
