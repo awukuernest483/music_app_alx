@@ -1,8 +1,9 @@
 "use client";
 
-import { Library, Search, Settings, XIcon } from "lucide-react";
+import { Library, LucideLogOut, Search, Settings, XIcon } from "lucide-react";
 import Userheader from "./userheader";
 import { useLocation, useNavigate } from "react-router-dom";
+import { logout } from "../script";
 
 interface SidenavProps {
   onClose?: () => void;
@@ -75,10 +76,10 @@ export const Sidenav = ({ onClose, isOpen = true }: SidenavProps) => {
           </header>
 
           <div className="flex-1 pt-4 lg:pt-3 px-6 sm:px-8 lg:px-6 overflow-y-auto">
-            <div className="flex flex-col gap-6 lg:gap-5">
+            <div className="flex flex-col h-full gap-6 lg:gap-5">
               {/* Links */}
-              <section className="flex flex-col gap-3 lg:gap-2.5">
-                <div className="flex flex-col">
+              <section className="flex flex-col h-full gap-3 lg:gap-2.5">
+                <div className="flex flex-col  h-full">
                   <Userheader name="Ernest Junior" />
                   {navlinks.map((item, index) => (
                     <div
@@ -100,6 +101,24 @@ export const Sidenav = ({ onClose, isOpen = true }: SidenavProps) => {
                       </span>
                     </div>
                   ))}
+                  <div className="h-full">
+                    <div
+                      className="flex h-full gap-1 items-end justify-center pb-10"
+                      onClick={() => {
+                        logout();
+                      }}
+                    >
+                      <div
+                        className="flex h-fit gap-1 items-center justify-center  rounded-full px-3 py-2 bg-black/50 cursor-pointer"
+                        onClick={() => {
+                          logout();
+                        }}
+                      >
+                        <LucideLogOut className="text-white h-4" />
+                        <p className="text-base text-white">Logout</p>
+                      </div>
+                    </div>
+                  </div>
                 </div>
               </section>
             </div>

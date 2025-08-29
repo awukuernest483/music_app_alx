@@ -1,8 +1,8 @@
+import { useUserStore } from "./assets/store/store";
+
 const clientId = "941d6389eb244304b5fc2fb75fdf4131";
-// Update this to your current ngrok URL or permanent domain
 const redirectUri = "https://lenient-bengal-sharing.ngrok-free.app/search";
 
-// In-memory storage as fallback (for environments where localStorage isn't available)
 let memoryStorage = {};
 
 function setItem(key, value) {
@@ -41,20 +41,20 @@ export async function spotifyLogin() {
   }
 
   if (!code) {
-    // No code yet → redirect to Spotify login
     console.log("No authorization code found, redirecting to Spotify...");
     await redirectToAuthCodeFlow(clientId);
   } else {
     try {
       const accessToken = await getAccessToken(clientId, code);
-      console.log("Access token received:", accessToken);
-
-      // Save token for later use
+      useUserStore.getState().setAccessToken(accessToken);
       setItem("access_token", accessToken);
 
       // Fetch profile right away
       const profile = await fetchProfile(accessToken);
+      console.log("Access token received:", accessToken);
       console.log("Profile fetched:", profile);
+      useUserStore.getState().setProfile(profile);
+      setItem("profile", JSON.stringify(profile));
 
       // Optionally: populate UI elements (if you have them)
       populateUI(profile);
