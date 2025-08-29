@@ -23,15 +23,18 @@ function App() {
     setIsSidenavOpen(false)
   }
 
+  // console.log(location.pathname + "🤣")
+
   return (
     <Router>
       <div className='w-full h-screen bg-[#121717] flex relative'>
         {/* Mobile Menu Button */}
-        <button
-          onClick={toggleSidenav}
-          className="lg:hidden fixed top-4 left-4 z-50 p-2 rounded-md bg-[#1C2426] hover:bg-[#2a3437] transition-colors"
-          aria-label="Open menu"
-        >
+        {(location.pathname !== "/auth" && location.pathname !== "/") && <div className=''>
+          <button
+            onClick={toggleSidenav}
+            className="lg:hidden fixed top-4 left-4 z-50 p-2 rounded-md bg-[#1C2426] hover:bg-[#2a3437] transition-colors"
+            aria-label="Open menu"
+          >
           <Menu className="w-6 h-6 text-white" />
         </button>
 
@@ -53,17 +56,17 @@ function App() {
           <Sidenav onClose={closeSidenav} />
         </div>
 
+        </div>}
+       
         {/* Main Content */}
         <div className="flex-1 lg:ml-0">
           <div className="pt-16 lg:pt-0 h-full">
             <Routes>
-              <Route path="/" element={<Navigate to="/search" replace />} />
+              <Route path="/" element={<Navigate to="/auth" replace />} />
               <Route path="/auth" element={<AuthPage />} />
               <Route path="/search" element={<Search />} />
               <Route path="/library" element={<Library />} />
               <Route path="/settings" element={<Settings />} />
-              {/* Catch all route - redirect to search */}
-              <Route path="*" element={<Navigate to="/search" replace />} />
             </Routes>
           </div>
         </div>
