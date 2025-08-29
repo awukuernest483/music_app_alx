@@ -3,6 +3,7 @@ import Musiccardsmall from "../components/musiccardsmall";
 import Genrecard from "../components/genrecard";
 import Searchbox from "../components/searchbox";
 import AlbumCard from "../components/albumcard";
+import { fetchProfileButtonHandler, spotifyLogin } from "../script";
 
 const dummydetails = [
   {
@@ -50,7 +51,12 @@ const Search = () => {
       </header>
 
       <p className="text-white text-lg p-4 font-bold">Genres</p>
-      <div className="flex flex-wrap p-4 gap-4 mb-4">
+      <div
+        className="flex flex-wrap p-4 gap-4 mb-4"
+        onClick={() => {
+          // fetchProfileButtonHandler();
+        }}
+      >
         {dummygenres.map((item, index) => (
           <Genrecard key={index} title={item.title} />
         ))}

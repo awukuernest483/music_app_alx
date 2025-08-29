@@ -1,87 +1,264 @@
 const clientId = "941d6389eb244304b5fc2fb75fdf4131";
-const params = new URLSearchParams(window.location.search);
-const code = undefined;
+// Update this to your current ngrok URL or permanent domain
+const redirectUri = "https://lenient-bengal-sharing.ngrok-free.app/search";
 
+// In-memory storage as fallback (for environments where localStorage isn't available)
+let memoryStorage = {};
 
-
-export async function spotifyLogin(){
-    if (!code) {
-    redirectToAuthCodeFlow(clientId!);
-      
-
-} else {
-    const accessToken = await getAccessToken(clientId!, code);
-  
-    const profile = await fetchProfile(accessToken);
-    populateUI(profile);
+function setItem(key, value) {
+  try {
+    localStorage.setItem(key, value);
+  } catch (e) {
+    memoryStorage[key] = value;
+  }
 }
 
+function getItem(key) {
+  try {
+    return localStorage.getItem(key) || memoryStorage[key];
+  } catch (e) {
+    return memoryStorage[key];
+  }
 }
 
-export async function redirectToAuthCodeFlow(clientId: string) {
+function removeItem(key) {
+  try {
+    localStorage.removeItem(key);
+  } catch (e) {
+    delete memoryStorage[key];
+  }
+}
+
+export async function spotifyLogin() {
+  const params = new URLSearchParams(window.location.search);
+  const code = params.get("code");
+  const error = params.get("error");
+
+  if (error) {
+    console.error("Spotify authorization error:", error);
+    alert(`Authorization failed: ${error}`);
+    return;
+  }
+
+  if (!code) {
+    // No code yet → redirect to Spotify login
+    console.log("No authorization code found, redirecting to Spotify...");
+    await redirectToAuthCodeFlow(clientId);
+  } else {
+    try {
+      const accessToken = await getAccessToken(clientId, code);
+      console.log("Access token received:", accessToken);
+
+      // Save token for later use
+      setItem("access_token", accessToken);
+
+      // Fetch profile right away
+      const profile = await fetchProfile(accessToken);
+      console.log("Profile fetched:", profile);
+
+      // Optionally: populate UI elements (if you have them)
+      populateUI(profile);
+
+      // Clean up URL (remove ?code=...)
+      window.history.replaceState({}, document.title, redirectUri);
+
+      // Clean up verifier
+      removeItem("verifier");
+
+      return profile; // ✅ Return profile so React can use it
+    } catch (error) {
+      console.error("Error during token exchange:", error);
+      //   alert(`Authentication failed: ${error.message}`);
+    }
+  }
+}
+
+export async function redirectToAuthCodeFlow(clientId) {
+  try {
     const verifier = generateCodeVerifier(128);
     const challenge = await generateCodeChallenge(verifier);
 
-    localStorage.setItem("verifier", verifier);
+    console.log("Generated verifier:", verifier);
+    setItem("verifier", verifier);
 
     const params = new URLSearchParams();
     params.append("client_id", clientId);
     params.append("response_type", "code");
-    params.append("redirect_uri", "https://fc6b5de51fed.ngrok-free.app/search");
+    params.append("redirect_uri", redirectUri);
     params.append("scope", "user-read-private user-read-email");
     params.append("code_challenge_method", "S256");
     params.append("code_challenge", challenge);
 
-    document.location = `https://accounts.spotify.com/authorize?${params.toString()}`;
+    const authUrl = `https://accounts.spotify.com/authorize?${params.toString()}`;
+    console.log("Redirecting to:", authUrl);
+
+    document.location = authUrl;
+  } catch (error) {
+    console.error("Error in redirect flow:", error);
+    throw error;
+  }
 }
 
-function generateCodeVerifier(length: number) {
-    let text = '';
-    let possible = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+function generateCodeVerifier(length) {
+  let text = "";
+  const possible =
+    "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+  for (let i = 0; i < length; i++) {
+    text += possible.charAt(Math.floor(Math.random() * possible.length));
+  }
+  return text;
+}
 
-    for (let i = 0; i < length; i++) {
-        text += possible.charAt(Math.floor(Math.random() * possible.length));
+async function generateCodeChallenge(codeVerifier) {
+  const data = new TextEncoder().encode(codeVerifier);
+  const digest = await window.crypto.subtle.digest("SHA-256", data);
+  return btoa(String.fromCharCode.apply(null, [...new Uint8Array(digest)]))
+    .replace(/\+/g, "-")
+    .replace(/\//g, "_")
+    .replace(/=+$/, "");
+}
+
+async function getAccessToken(clientId, code) {
+  const verifier = getItem("verifier");
+
+  if (!verifier) {
+    throw new Error(
+      "Code verifier not found. Please restart the authentication flow."
+    );
+  }
+
+  console.log("Using verifier:", verifier);
+
+  const params = new URLSearchParams();
+  params.append("client_id", clientId);
+  params.append("grant_type", "authorization_code");
+  params.append("code", code);
+  params.append("redirect_uri", redirectUri);
+  params.append("code_verifier", verifier);
+
+  console.log("Token request params:", Object.fromEntries(params));
+
+  const result = await fetch("https://accounts.spotify.com/api/token", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/x-www-form-urlencoded",
+    },
+    body: params,
+  });
+
+  const data = await result.json();
+  console.log("Token response:", data);
+
+  if (!result.ok || data.error) {
+    throw new Error(
+      `Token request failed: ${data.error || result.status} - ${
+        data.error_description || result.statusText
+      }`
+    );
+  }
+
+  if (!data.access_token) {
+    throw new Error("No access token received from Spotify");
+  }
+
+  return data.access_token;
+}
+
+async function fetchProfile(token) {
+  const result = await fetch("https://api.spotify.com/v1/me", {
+    headers: {
+      Authorization: `Bearer ${token}`,
+      "Content-Type": "application/json",
+    },
+  });
+
+  if (!result.ok) {
+    const errorData = await result.json().catch(() => ({}));
+    throw new Error(
+      `Failed to fetch profile: ${result.status} - ${
+        errorData.error?.message || result.statusText
+      }`
+    );
+  }
+
+  return await result.json();
+}
+
+function populateUI(profile) {
+  const elements = {
+    displayName: document.getElementById("displayName"),
+    avatar: document.getElementById("avatar"),
+    id: document.getElementById("id"),
+    email: document.getElementById("email"),
+    uri: document.getElementById("uri"),
+    url: document.getElementById("url"),
+    imgUrl: document.getElementById("imgUrl"),
+  };
+
+  // Check if elements exist before trying to populate them
+  if (elements.displayName)
+    elements.displayName.innerText = profile.display_name || "N/A";
+  if (elements.id) elements.id.innerText = profile.id || "N/A";
+  if (elements.email) elements.email.innerText = profile.email || "N/A";
+  if (elements.uri) {
+    elements.uri.innerText = profile.uri || "N/A";
+    if (profile.external_urls?.spotify) {
+      elements.uri.setAttribute("href", profile.external_urls.spotify);
     }
-    return text;
-}
-
-async function generateCodeChallenge(codeVerifier: string) {
-    const data = new TextEncoder().encode(codeVerifier);
-    const digest = await window.crypto.subtle.digest('SHA-256', data);
-    return btoa(String.fromCharCode.apply(null, [...new Uint8Array(digest)]))
-        .replace(/\+/g, '-')
-        .replace(/\//g, '_')
-        .replace(/=+$/, '');
-}
-
-async function getAccessToken(clientId: string, code: string) {
-  // TODO: Get access token for code
-}
-
-async function fetchProfile(token: string): Promise<any> {
-    const result = await fetch("https://api.spotify.com/v1/me", {
-        method: "GET", headers: { Authorization: `Bearer ${token}` }
-    });
-
-    
-
-    return await result.json();
-}
-
-function populateUI(profile: any) {
-    document.getElementById("displayName")!.innerText = profile.display_name;
-    if (profile.images[0]) {
-        const profileImage = new Image(200, 200);
-        profileImage.src = profile.images[0].url;
-        document.getElementById("avatar")!.appendChild(profileImage);
+  }
+  if (elements.url) {
+    elements.url.innerText = profile.href || "N/A";
+    if (profile.href) {
+      elements.url.setAttribute("href", profile.href);
     }
-    document.getElementById("id")!.innerText = profile.id;
-    document.getElementById("email")!.innerText = profile.email;
-    document.getElementById("uri")!.innerText = profile.uri;
-    document.getElementById("uri")!.setAttribute("href", profile.external_urls.spotify);
-    document.getElementById("url")!.innerText = profile.href;
-    document.getElementById("url")!.setAttribute("href", profile.href);
-    document.getElementById("imgUrl")!.innerText = profile.images[0]?.url ?? '(no profile image)';
+  }
+  if (elements.imgUrl) {
+    elements.imgUrl.innerText =
+      profile.images?.[0]?.url || "(no profile image)";
+  }
+
+  if (elements.avatar && profile.images?.[0]) {
+    // Clear existing images
+    elements.avatar.innerHTML = "";
+    const profileImage = new Image(200, 200);
+    profileImage.src = profile.images[0].url;
+    profileImage.alt = "Profile image";
+    elements.avatar.appendChild(profileImage);
+  }
 }
 
+export async function fetchProfileButtonHandler() {
+  try {
+    const token = getItem("access_token");
+    if (!token) {
+      alert("No access token found. Please log in first!");
+      return;
+    }
 
+    console.log("Fetching profile with token:", token.substring(0, 20) + "...");
+    const profile = await fetchProfile(token);
+    console.log("Profile data:", profile);
+    populateUI(profile);
+  } catch (error) {
+    console.error("Error fetching profile:", error);
+    alert(`Failed to fetch profile: ${error.message}`);
+
+    // If token is invalid, clear it
+    if (error.message.includes("401") || error.message.includes("invalid")) {
+      removeItem("access_token");
+      alert("Token expired. Please log in again.");
+    }
+  }
+}
+
+// Utility function to check if user is logged in
+export function isLoggedIn() {
+  return !!getItem("access_token");
+}
+
+// Utility function to logout
+export function logout() {
+  removeItem("access_token");
+  removeItem("verifier");
+  console.log("Logged out successfully");
+}

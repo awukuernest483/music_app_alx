@@ -36,7 +36,7 @@ const AuthPage = () => {
               text="Login with Spotify"
               onClick={(e) => {
                 e.preventDefault();
-                console.log("Work");
+                console.log("cvldjfmld.");
                 spotifyLogin();
               }}
               type="submit"
