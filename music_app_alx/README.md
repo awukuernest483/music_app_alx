@@ -1,12 +1,48 @@
-# React + Vite
+🎵 Groovio — Spotify Web App
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+Groovio is a clean, responsive music discovery app built with React and Tailwind CSS. Users can log in with Spotify, search for tracks, albums, and artists, and explore music details — all in one place. Playback happens via Spotify links.
 
-Currently, two official plugins are available:
+🚀 Features
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+Spotify Authentication: Log in securely using your Spotify account.
 
-## Expanding the ESLint configuration
+Search Music: Look up tracks, albums, and artists in real-time.
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+Music Details: View detailed info about tracks, albums, and artists.
+
+Spotify Playback: Click links to open and play songs directly in Spotify.
+
+Responsive UI: Works smoothly on both desktop and mobile.
+
+🛠️ Tech Stack
+
+Frontend: React, Tailwind CSS
+
+API: Spotify Web API
+
+Deployment: Vercel
+
+⚙️ Setup & Installation
+
+Clone the repo:
+
+git clone https://github.com/awukuernest483/music_app_alx.git
+
+Enter the project directory:
+
+cd music_app_alx
+
+Install dependencies:
+
+npm install
+
+Add your Spotify API credentials in a .env file:
+
+REACT_APP_SPOTIFY_CLIENT_ID=your_client_id
+REACT_APP_SPOTIFY_REDIRECT_URI=http://localhost:3000
+
+Start the development server:
+
+npm start
+
+Open http://localhost:3000 in your browser.
