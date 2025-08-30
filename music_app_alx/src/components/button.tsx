@@ -23,9 +23,9 @@ const Button = ({
       type={type}
       onClick={onClick}
       className={`${color ?? "bg-[#0DBDF2]"} ${textcolor ?? "text-[#000000]"}
-      p-4 rounded-lg cursor-pointer gap-4 text-center text-xl justify-center w-1/2 items-center hover:opacity-90 transition flex`}
+      md:p-4 p-2 rounded-lg cursor-pointer gap-4 text-center md:text-xl text-sm justify-center md:w-1/2 w-full items-center hover:opacity-90 transition flex`}
     >
-      {imgpath && <img src={spotifylogo} className="w-10 h-10" />}
+      {imgpath && <img src={spotifylogo} className="w-10 md:h-10 h-8" />}
       {text}
     </button>
   );

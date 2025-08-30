@@ -73,8 +73,8 @@ function App() {
         )}
 
         {/* Main Content */}
-        <div className="flex-1 lg:ml-0">
-          <div className="pt-16 lg:pt-0 h-full">
+        <div className="flex-1">
+          <div className="h-full">
             <Routes>
               <Route path="/" element={<Navigate to="/auth" replace />} />
               <Route path="/auth" element={<AuthPage />} />

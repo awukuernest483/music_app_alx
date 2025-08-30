@@ -1,9 +1,7 @@
-import React from "react";
-import CustomInput from "../components/custominput";
-import Button from "../components/button";
 import authimage from "../assets/images/authback.jpg";
-import { redirectToAuthCodeFlow, spotifyLogin } from "../script";
 import logo from "../assets/logo.svg";
+import Button from "../components/button";
+import { spotifyLogin } from "../script";
 
 const AuthPage = () => {
   return (
@@ -16,19 +14,16 @@ const AuthPage = () => {
       <div className="flex flex-col w-full h-full flex-1">
         <form className="flex flex-col gap-20 m-auto w-3/4 text-[#9CB2BA]">
           <div className="items-center justify-center flex-col flex">
-            <img src={logo} className="h-30 mt-20 mb-20" />
+            <img src={logo} className="h-30  mb-20 " />
 
-            <p className="font-bold text-4xl text-center text-white">
+            <p className="font-bold md:text-4xl text-lg text-center text-white">
               Feel the Beat, Live the Moment
             </p>
-            <p className="text-white/50 text-xl text-center text-wrap">
+            <p className="text-white/50 md:text-xl text-sm text-center text-wrap">
               Your music, your vibe. Discover, stream, and groove anywhere.
             </p>
           </div>
 
-          {/* <CustomInput placeholder="Username or Email" type="text" />
-          <CustomInput placeholder="Password" type="password" /> */}
-          {/* <p className="text-base text-left cursor-pointer">Forgot Password?</p> */}
           <div className=" w-full items-center flex justify-center">
             <Button
               textcolor="text-white"

@@ -1,5 +1,4 @@
-import { ChevronRight } from "lucide-react";
-import React from "react";
+import { ChevronRight, LucideLogOut } from "lucide-react";
 import authimage from "../assets/images/authimage.png";
 import { useSpotifyStore } from "../assets/store/store";
 
@@ -14,7 +13,7 @@ const Settings = () => {
     { id: 7, title: "About" },
   ];
 
-  const { profile, accessToken, logout } = useSpotifyStore();
+  const { profile, logout } = useSpotifyStore();
 
   return (
     <div className="h-full  flex flex-col w-full p-10 gap-10">
@@ -42,6 +41,19 @@ const Settings = () => {
             <ChevronRight />
           </button>
         ))}
+      </div>
+
+      <div className="flex  gap-1 items-start justify-start pb-10">
+        <div
+          className="flex h-fit gap-1 items-center justify-center rounded-full px-3 py-2 hover:bg-[#9CB2BA] hover:text-black text-white bg-black/50 cursor-pointer"
+          onClick={() => {
+            window.location.href = "/auth";
+            logout();
+          }}
+        >
+          <LucideLogOut className=" h-4 " />
+          <p className="text-base ">Logout</p>
+        </div>
       </div>
     </div>
   );

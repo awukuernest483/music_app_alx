@@ -1,12 +1,12 @@
 import React from "react";
 
-interface CustomInputProps {
+interface InputProps {
   placeholder: string;
 
   type?: string;
 }
 
-const CustomInput = ({ placeholder, type }: CustomInputProps) => {
+const Input = ({ placeholder, type }: InputProps) => {
   return (
     <input
       className="bg-[#9CB2BA] w-full p-4 rounded-md text-[#000000] text-base "
@@ -16,4 +16,4 @@ const CustomInput = ({ placeholder, type }: CustomInputProps) => {
   );
 };
 
-export default CustomInput;
+export default Input;

@@ -26,7 +26,7 @@ const Musiccardsmall = ({
           src={imageUrl ?? authimage}
           alt="Music"
           className={`${
-            iscategory == true ? "h-20 w-20" : "h-10 w-10 ml-5"
+            iscategory == true ? "h-full w-20" : "h-10 w-10 ml-5"
           }  object-cover rounded-md`}
         />
 

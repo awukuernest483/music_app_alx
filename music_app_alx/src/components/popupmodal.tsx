@@ -1,3 +1,4 @@
+import { X } from "lucide-react";
 import React from "react";
 
 interface PopupModalProps {
@@ -10,23 +11,25 @@ const PopupModal: React.FC<PopupModalProps> = ({ selectedItem, onClose }) => {
 
   return (
     <div
-      className="fixed inset-0 bg-white/30 bg-opacity-70 flex items-center justify-center z-50"
-      onClick={onClose} // click backdrop to close
+      className="fixed inset-0 bg-black/50 bg-opacity-50 flex items-center justify-center z-50"
+      onClick={onClose}
     >
       <div
         className="bg-gray-900 text-white p-6 rounded-xl max-w-md w-full relative"
-        onClick={(e) => e.stopPropagation()} // prevent backdrop close when clicking inside
+        onClick={(e) => e.stopPropagation()}
       >
-        {/* Close Button */}
-        <button
-          onClick={onClose}
-          className="absolute top-3 right-3 text-white bg-red-600 hover:bg-red-500 px-2 py-1 rounded-md text-sm"
-        >
-          ✕
-        </button>
+        <div className="items-center flex justify-between">
+          {/* Title */}
+          <h2 className="text-xl font-bold mb-4">{selectedItem.name}</h2>
 
-        {/* Title */}
-        <h2 className="text-xl font-bold mb-4">{selectedItem.name}</h2>
+          {/* Close Button */}
+          <button
+            onClick={onClose}
+            className=" text-white bg-red-600 hover:bg-red-500 px-2 py-1 rounded-md text-sm"
+          >
+            <X size={20} />
+          </button>
+        </div>
 
         {/* Image */}
         {(selectedItem.images?.[0]?.url ||
