@@ -114,10 +114,10 @@ export const Sidenav = ({ onClose, isOpen = true }: SidenavProps) => {
                   <div className="h-full">
                     <div className="flex h-full gap-1 items-end justify-center pb-10">
                       <div
-                        className="flex h-fit gap-1 items-center justify-center  rounded-full px-3 py-2 bg-black/50 cursor-pointer"
+                        className="flex h-fit gap-1 items-center justify-center rounded-full px-3 py-2 bg-black/50 cursor-pointer"
                         onClick={() => {
+                          window.location.href = "/auth";
                           logout();
-                          navigate("/auth");
                         }}
                       >
                         <LucideLogOut className="text-white h-4" />
