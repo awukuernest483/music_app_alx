@@ -8,7 +8,7 @@ interface SearchboxProps {
 
 const Searchbox = ({ onSearch }: { onSearch: (q: string) => void }) => {
   return (
-    <div className=" max-w-sm w-sm text-center items-center bg-[#2A2D30] border border-[#3A3D40] rounded-md p-3 text-white flex gap-3">
+    <div className=" md:max-w-sm w-full text-center items-center bg-[#2A2D30] border border-[#3A3D40] rounded-md p-3 text-white flex gap-3">
       <Search className=" text-white" />
       <input
         type="text"

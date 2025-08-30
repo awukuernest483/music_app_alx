@@ -5,15 +5,18 @@ interface MusiccardsmallProps {
   title?: string;
   imageUrl?: string;
   iscategory?: boolean;
+  onClick?: () => void;
 }
 
 const Musiccardsmall = ({
   title,
   imageUrl,
   iscategory,
+  onClick,
 }: MusiccardsmallProps) => {
   return (
     <div
+      onClick={onClick}
       className={`${
         iscategory == true ? "w-fit" : "w-full"
       } h-20  bg-[#1C2426] border border-[#3B4F54] rounded-md cursor-pointer`}

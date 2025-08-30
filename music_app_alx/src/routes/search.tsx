@@ -5,6 +5,8 @@ import Musiccardsmall from "../components/musiccardsmall";
 import Searchbox from "../components/searchbox";
 import { spotifyLogin, isLoggedIn } from "../script";
 import Spinner from "../components/spinner";
+import { X } from "lucide-react";
+import PopupModal from "../components/popupmodal";
 
 const dummygenres = [
   { title: "Pop" },
@@ -24,6 +26,9 @@ const Search = () => {
   const [searching, setSearching] = useState(false);
   const [isInitialized, setIsInitialized] = useState(false);
   const { accessToken } = useSpotifyStore();
+
+  // NEW: selected item for popup
+  const [selectedItem, setSelectedItem] = useState<any | null>(null);
 
   useEffect(() => {
     if (!isInitialized) {
@@ -58,7 +63,7 @@ const Search = () => {
         if (!res.ok) throw new Error("Failed to fetch categories");
 
         const data = await res.json();
-        setCategories(data.categories.items || []);
+        setCategories(data.categories?.items || []);
       } catch (err) {
         console.error(err);
       }
@@ -94,7 +99,7 @@ const Search = () => {
       const res = await fetch(
         `https://api.spotify.com/v1/search?q=${encodeURIComponent(
           query
-        )}&type=track,album,artist&limit=10`,
+        )}&type=track,album&limit=10`,
         {
           headers: { Authorization: `Bearer ${accessToken}` },
         }
@@ -103,9 +108,7 @@ const Search = () => {
       if (!res.ok) throw new Error("Search failed");
 
       const data = await res.json();
-      // console.log("Search results:", data);
 
-      // Flatten results → show albums + tracks
       const combined = [
         ...(data.tracks?.items || []),
         ...(data.albums?.items || []),
@@ -117,6 +120,12 @@ const Search = () => {
     } finally {
       setSearching(false);
     }
+  };
+
+  // Use a small wrapper so we can log and be sure the handler runs
+  const handleItemClick = (item: any) => {
+    console.log("handleItemClick fired:", item?.id ?? item?.name);
+    setSelectedItem(item);
   };
 
   return (
@@ -145,21 +154,23 @@ const Search = () => {
                 </p>
                 <button
                   onClick={() => setSearchResults([])}
-                  className="text-sm bg-gray-700 h-fit hover:bg-gray-600 text-white px-3 py-1 rounded-md"
+                  className="text-sm bg-gray-700 h-fit hover:bg-gray-600 text-white px-3 py-1 rounded-md flex gap-2 items-center "
                 >
+                  <X className="w-3 h-3" />
                   Clear results
                 </button>
               </div>
               <div className="w-full p-4 grid grid-cols-1 md:grid-cols-2 gap-4">
                 {searchResults.map((item) => (
                   <Musiccardsmall
-                    key={item.id}
+                    key={item.id ?? item.uri ?? item.name}
                     title={item.name}
                     imageUrl={
                       item.images?.[0]?.url ||
                       item.album?.images?.[0]?.url ||
                       ""
                     }
+                    onClick={() => handleItemClick(item)}
                   />
                 ))}
               </div>
@@ -182,6 +193,7 @@ const Search = () => {
                       title={item.name}
                       imageUrl={item.icons?.[0]?.url || ""}
                       iscategory={true}
+                      onClick={() => handleItemClick(item)}
                     />
                   ))
                 )}
@@ -199,7 +211,7 @@ const Search = () => {
               <p className="text-white text-lg p-4 font-bold">
                 Recommended Albums
               </p>
-              <div className="w-full p-4 grid grid-cols-2 gap-4">
+              <div className="w-full p-4 grid md:grid-cols-2 grid-cols-1 gap-4">
                 {recommendedalbums.length === 0 ? (
                   <p className="text-gray-400">
                     {!accessToken
@@ -212,6 +224,7 @@ const Search = () => {
                       key={item.id}
                       title={item.name}
                       imageUrl={item.images?.[0]?.url || ""}
+                      onClick={() => handleItemClick(item)}
                     />
                   ))
                 )}
@@ -219,6 +232,14 @@ const Search = () => {
             </>
           )}
         </div>
+      )}
+
+      {/* POPUP MODAL */}
+      {selectedItem && (
+        <PopupModal
+          selectedItem={selectedItem}
+          onClose={() => setSelectedItem(null)}
+        />
       )}
     </div>
   );

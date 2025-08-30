@@ -36,7 +36,7 @@ const Settings = () => {
         {settingsOptions.map((option) => (
           <button
             key={option.id}
-            className="w-full flex flex-row cursor-pointer hover:bg-[#9CB2BA] transition-colors hover:text-white text-white px-2 py-3 mb-2 justify-between rounded-md"
+            className="w-full max-w-sm flex flex-row cursor-pointer hover:bg-[#9CB2BA] transition-colors hover:text-white text-white px-2 py-3 mb-2 justify-between rounded-md"
           >
             {option.title}
             <ChevronRight />
