@@ -1,7 +1,6 @@
 import { useSpotifyStore } from "./assets/store/store";
 
 const clientId = "941d6389eb244304b5fc2fb75fdf4131";
-// Update this to your current ngrok URL or permanent domain
 const redirectUri = "https://lenient-bengal-sharing.ngrok-free.app/search";
 
 // In-memory storage as fallback (for environments where localStorage isn't available)
@@ -55,7 +54,6 @@ export async function spotifyLogin() {
       const profile = await fetchProfile(accessToken);
       console.log("Profile fetched:", profile);
 
-      // ✅ Save into Zustand
       useSpotifyStore.getState().setAccessToken(accessToken);
       useSpotifyStore.getState().setProfile(profile);
 
@@ -191,7 +189,6 @@ function populateUI(profile) {
     imgUrl: document.getElementById("imgUrl"),
   };
 
-  // Check if elements exist before trying to populate them
   if (elements.displayName)
     elements.displayName.innerText = profile.display_name || "N/A";
   if (elements.id) elements.id.innerText = profile.id || "N/A";
@@ -214,7 +211,6 @@ function populateUI(profile) {
   }
 
   if (elements.avatar && profile.images?.[0]) {
-    // Clear existing images
     elements.avatar.innerHTML = "";
     const profileImage = new Image(200, 200);
     profileImage.src = profile.images[0].url;
@@ -236,7 +232,6 @@ export async function fetchProfileButtonHandler() {
     populateUI(profile);
   } catch (error) {
     console.error("Error fetching profile:", error);
-    // If token is invalid, clear it
     if (error.message.includes("401") || error.message.includes("invalid")) {
       removeItem("access_token");
     }

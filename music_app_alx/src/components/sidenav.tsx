@@ -1,11 +1,8 @@
-"use client";
-
-import { Library, LucideLogOut, Search, Settings, XIcon } from "lucide-react";
-import Userheader from "./userheader";
+import { Library, Search, Settings, XIcon } from "lucide-react";
 import { useLocation, useNavigate } from "react-router-dom";
-import { logout } from "../script";
-import { useSpotifyStore } from "../assets/store/store";
 import logo from "../assets/logo.svg";
+import { useSpotifyStore } from "../assets/store/store";
+import Userheader from "./userheader";
 
 interface SidenavProps {
   onClose?: () => void;

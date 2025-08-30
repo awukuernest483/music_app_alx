@@ -30,7 +30,7 @@ export const useSpotifyStore = create<SpotifyState>()(
       logout: () => set({ accessToken: null, profile: null }),
     }),
     {
-      name: "spotify-auth", // key in localStorage
+      name: "spotify-auth",
     }
   )
 );

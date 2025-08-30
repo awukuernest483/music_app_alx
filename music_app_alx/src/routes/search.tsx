@@ -26,8 +26,6 @@ const Search = () => {
   const [searching, setSearching] = useState(false);
   const [isInitialized, setIsInitialized] = useState(false);
   const { accessToken } = useSpotifyStore();
-
-  // NEW: selected item for popup
   const [selectedItem, setSelectedItem] = useState<any | null>(null);
 
   useEffect(() => {
@@ -36,11 +34,9 @@ const Search = () => {
         const params = new URLSearchParams(window.location.search);
         const hasCode = params.has("code");
         const alreadyLoggedIn = isLoggedIn();
-
         if (hasCode || !alreadyLoggedIn) {
           await spotifyLogin();
         }
-
         setIsInitialized(true);
       };
 
@@ -59,9 +55,7 @@ const Search = () => {
             headers: { Authorization: `Bearer ${accessToken}` },
           }
         );
-
         if (!res.ok) throw new Error("Failed to fetch categories");
-
         const data = await res.json();
         setCategories(data.categories?.items || []);
       } catch (err) {
@@ -91,7 +85,7 @@ const Search = () => {
     fetchRecommendedAlbums();
   }, [accessToken, isInitialized]);
 
-  // 🔍 SEARCH FUNCTION
+  // SEARCH FUNCTION
   const handleSearch = async (query: string) => {
     if (!query || !accessToken) return;
     setSearching(true);
@@ -143,7 +137,7 @@ const Search = () => {
         <div>
           {/* If searching → show results */}
           {searching ? (
-            <div className="flex justify-center p-6">
+            <div className="flex justify-center p-6 text-white">
               <Spinner />
             </div>
           ) : searchResults.length > 0 ? (

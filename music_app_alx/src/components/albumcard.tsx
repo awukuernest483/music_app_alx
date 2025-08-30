@@ -1,4 +1,3 @@
-import React from "react";
 import authimage from "../assets/images/authimage.png";
 
 interface AlbumCardProps {

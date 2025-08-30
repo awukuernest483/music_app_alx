@@ -1,10 +1,4 @@
 import { Search } from "lucide-react";
-import React from "react";
-
-interface SearchboxProps {
-  value?: string;
-  onChange?: (e: React.ChangeEvent<HTMLInputElement>) => void;
-}
 
 const Searchbox = ({ onSearch }: { onSearch: (q: string) => void }) => {
   return (

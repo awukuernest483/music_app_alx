@@ -19,10 +19,8 @@ const PopupModal: React.FC<PopupModalProps> = ({ selectedItem, onClose }) => {
         onClick={(e) => e.stopPropagation()}
       >
         <div className="items-center flex justify-between">
-          {/* Title */}
           <h2 className="text-xl font-bold mb-4">{selectedItem.name}</h2>
 
-          {/* Close Button */}
           <button
             onClick={onClose}
             className=" text-white bg-red-600 hover:bg-red-500 px-2 py-1 rounded-md text-sm"
@@ -31,7 +29,6 @@ const PopupModal: React.FC<PopupModalProps> = ({ selectedItem, onClose }) => {
           </button>
         </div>
 
-        {/* Image */}
         {(selectedItem.images?.[0]?.url ||
           selectedItem.album?.images?.[0]?.url) && (
           <img
@@ -44,7 +41,6 @@ const PopupModal: React.FC<PopupModalProps> = ({ selectedItem, onClose }) => {
           />
         )}
 
-        {/* Artists */}
         {selectedItem.artists && (
           <p className="mb-2">
             <span className="font-semibold">Artists:</span>{" "}
@@ -52,7 +48,6 @@ const PopupModal: React.FC<PopupModalProps> = ({ selectedItem, onClose }) => {
           </p>
         )}
 
-        {/* Release Date */}
         {selectedItem.release_date && (
           <p className="mb-2">
             <span className="font-semibold">Release date:</span>{" "}
@@ -60,19 +55,17 @@ const PopupModal: React.FC<PopupModalProps> = ({ selectedItem, onClose }) => {
           </p>
         )}
 
-        {/* Type / Extra */}
         {selectedItem.type && (
           <p className="text-sm text-gray-400 mb-2">
             Type: {selectedItem.type}
           </p>
         )}
 
-        {/* Track Preview */}
         {selectedItem.type === "track" &&
           (selectedItem.preview_url ? (
             <div className="mt-4">
               <audio
-                key={selectedItem.preview_url} // ensures audio resets when switching tracks
+                key={selectedItem.preview_url}
                 controls
                 autoPlay
                 src={selectedItem.preview_url}
@@ -85,7 +78,6 @@ const PopupModal: React.FC<PopupModalProps> = ({ selectedItem, onClose }) => {
             <p className="text-gray-400 mt-2">Preview not available</p>
           ))}
 
-        {/* Open on Spotify button */}
         {selectedItem.external_urls?.spotify && (
           <a
             href={selectedItem.external_urls.spotify}
