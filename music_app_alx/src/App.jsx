@@ -7,7 +7,7 @@ import {
   Routes,
 } from "react-router-dom";
 import "./App.css";
-import { useUserStore } from "./assets/store/store";
+// import { useUserStore } from "./assets/store/store";
 
 // Components
 import { Sidenav } from "./components/sidenav";
@@ -30,7 +30,7 @@ function App() {
     setIsSidenavOpen(false);
   };
 
-  const { login } = useUserStore();
+  // const { login } = useUserStore();
 
   // useEffect(() => {
   //   login();

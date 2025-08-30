@@ -1,8 +1,10 @@
-import { useUserStore } from "./assets/store/store";
+import { useSpotifyStore } from "./assets/store/store";
 
 const clientId = "941d6389eb244304b5fc2fb75fdf4131";
+// Update this to your current ngrok URL or permanent domain
 const redirectUri = "https://lenient-bengal-sharing.ngrok-free.app/search";
 
+// In-memory storage as fallback (for environments where localStorage isn't available)
 let memoryStorage = {};
 
 function setItem(key, value) {
@@ -36,7 +38,6 @@ export async function spotifyLogin() {
 
   if (error) {
     console.error("Spotify authorization error:", error);
-    alert(`Authorization failed: ${error}`);
     return;
   }
 
@@ -45,30 +46,25 @@ export async function spotifyLogin() {
     await redirectToAuthCodeFlow(clientId);
   } else {
     try {
+      console.log("Authorization code found, exchanging for access token...");
       const accessToken = await getAccessToken(clientId, code);
-      useUserStore.getState().setAccessToken(accessToken);
+      console.log("Access token received:", accessToken);
+
       setItem("access_token", accessToken);
 
-      // Fetch profile right away
       const profile = await fetchProfile(accessToken);
-      console.log("Access token received:", accessToken);
       console.log("Profile fetched:", profile);
-      useUserStore.getState().setProfile(profile);
-      setItem("profile", JSON.stringify(profile));
 
-      // Optionally: populate UI elements (if you have them)
+      // ✅ Save into Zustand
+      useSpotifyStore.getState().setAccessToken(accessToken);
+      useSpotifyStore.getState().setProfile(profile);
+
       populateUI(profile);
 
-      // Clean up URL (remove ?code=...)
       window.history.replaceState({}, document.title, redirectUri);
-
-      // Clean up verifier
       removeItem("verifier");
-
-      return profile; // ✅ Return profile so React can use it
     } catch (error) {
       console.error("Error during token exchange:", error);
-      //   alert(`Authentication failed: ${error.message}`);
     }
   }
 }
@@ -231,7 +227,6 @@ export async function fetchProfileButtonHandler() {
   try {
     const token = getItem("access_token");
     if (!token) {
-      alert("No access token found. Please log in first!");
       return;
     }
 
@@ -241,12 +236,9 @@ export async function fetchProfileButtonHandler() {
     populateUI(profile);
   } catch (error) {
     console.error("Error fetching profile:", error);
-    alert(`Failed to fetch profile: ${error.message}`);
-
     // If token is invalid, clear it
     if (error.message.includes("401") || error.message.includes("invalid")) {
       removeItem("access_token");
-      alert("Token expired. Please log in again.");
     }
   }
 }

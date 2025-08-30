@@ -1,32 +1,36 @@
 import { create } from "zustand";
-import { spotifyLogin } from "../../script";
+import { persist } from "zustand/middleware";
 
-interface UserState {
+interface SpotifyUser {
+  id: string;
+  display_name: string;
+  email: string;
+  uri: string;
+  href: string;
+  images?: { url: string }[];
+  external_urls?: { spotify: string };
+  [key: string]: any;
+}
+
+interface SpotifyState {
   accessToken: string | null;
-  profile: any | null;
-  setAccessToken: (token: string) => void;
-  setProfile: (profile: any) => void;
-  login: () => Promise<void>;
+  profile: SpotifyUser | null;
+  setAccessToken: (token: string | null) => void;
+  setProfile: (profile: SpotifyUser | null) => void;
   logout: () => void;
 }
 
-export const useUserStore = create<UserState>((set) => ({
-  accessToken: null,
-  profile: null,
-
-  setAccessToken: (token) => set({ accessToken: token }),
-  setProfile: (profile) => set({ profile }),
-
-  login: async () => {
-    const profile = await spotifyLogin();
-    if (profile) {
-      set({ profile });
+export const useSpotifyStore = create<SpotifyState>()(
+  persist(
+    (set) => ({
+      accessToken: null,
+      profile: null,
+      setAccessToken: (token) => set({ accessToken: token }),
+      setProfile: (profile) => set({ profile }),
+      logout: () => set({ accessToken: null, profile: null }),
+    }),
+    {
+      name: "spotify-auth", // key in localStorage
     }
-  },
-
-  logout: () => {
-    set({ accessToken: null, profile: null });
-    localStorage.removeItem("access_token");
-    localStorage.removeItem("verifier");
-  },
-}));
+  )
+);

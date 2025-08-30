@@ -6,14 +6,13 @@ interface SearchboxProps {
   onChange?: (e: React.ChangeEvent<HTMLInputElement>) => void;
 }
 
-const Searchbox = ({ value, onChange }: SearchboxProps) => {
+const Searchbox = ({ onSearch }: { onSearch: (q: string) => void }) => {
   return (
     <div className=" max-w-sm w-sm text-center items-center bg-[#2A2D30] border border-[#3A3D40] rounded-md p-3 text-white flex gap-3">
       <Search className=" text-white" />
       <input
         type="text"
-        value={value}
-        onChange={onChange}
+        onChange={(e) => onSearch(e.target.value)}
         className="bg-transparent outline-none w-full"
         placeholder="Search..."
       />

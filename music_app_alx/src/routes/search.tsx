@@ -1,34 +1,10 @@
+import { useEffect, useState } from "react";
+import { useSpotifyStore } from "../assets/store/store";
 import Genrecard from "../components/genrecard";
 import Musiccardsmall from "../components/musiccardsmall";
 import Searchbox from "../components/searchbox";
-import { fetchProfileButtonHandler } from "../script";
-
-const dummydetails = [
-  {
-    title: "Song Title",
-  },
-  {
-    title: "Another Song Title",
-  },
-  {
-    title: "Another Song Title",
-  },
-  {
-    title: "Song Title",
-  },
-  {
-    title: "Another Song Title",
-  },
-  {
-    title: "Another Song Title",
-  },
-  {
-    title: "Song Title",
-  },
-  {
-    title: "Another Song Title",
-  },
-];
+import { spotifyLogin, isLoggedIn } from "../script";
+import Spinner from "../components/spinner";
 
 const dummygenres = [
   { title: "Pop" },
@@ -42,36 +18,208 @@ const dummygenres = [
 ];
 
 const Search = () => {
+  const [categories, setCategories] = useState<any[]>([]);
+  const [recommendedalbums, setRecommendedAlbums] = useState<any[]>([]);
+  const [searchResults, setSearchResults] = useState<any[]>([]);
+  const [searching, setSearching] = useState(false);
+  const [isInitialized, setIsInitialized] = useState(false);
+  const { accessToken } = useSpotifyStore();
+
+  useEffect(() => {
+    if (!isInitialized) {
+      const initializeAuth = async () => {
+        const params = new URLSearchParams(window.location.search);
+        const hasCode = params.has("code");
+        const alreadyLoggedIn = isLoggedIn();
+
+        if (hasCode || !alreadyLoggedIn) {
+          await spotifyLogin();
+        }
+
+        setIsInitialized(true);
+      };
+
+      initializeAuth();
+    }
+  }, [isInitialized]);
+
+  useEffect(() => {
+    if (!accessToken || !isInitialized) return;
+
+    const fetchCategories = async () => {
+      try {
+        const res = await fetch(
+          "https://api.spotify.com/v1/browse/categories?locale=sv_SE&limit=10&offset=5",
+          {
+            headers: { Authorization: `Bearer ${accessToken}` },
+          }
+        );
+
+        if (!res.ok) throw new Error("Failed to fetch categories");
+
+        const data = await res.json();
+        setCategories(data.categories.items || []);
+      } catch (err) {
+        console.error(err);
+      }
+    };
+
+    const fetchRecommendedAlbums = async () => {
+      try {
+        const res = await fetch(
+          "https://api.spotify.com/v1/albums?ids=382ObEPsp2rxGrnsizN5TX,1A2GTWGtFfWp7KSQTwWOyo,2noRn2Aes5aoNVsU6iWThc&market=GH",
+          {
+            headers: { Authorization: `Bearer ${accessToken}` },
+          }
+        );
+
+        if (!res.ok) throw new Error("Failed to fetch albums");
+
+        const data = await res.json();
+        setRecommendedAlbums(data.albums || []);
+      } catch (err) {
+        console.error(err);
+      }
+    };
+
+    fetchCategories();
+    fetchRecommendedAlbums();
+  }, [accessToken, isInitialized]);
+
+  // 🔍 SEARCH FUNCTION
+  const handleSearch = async (query: string) => {
+    if (!query || !accessToken) return;
+    setSearching(true);
+    try {
+      const res = await fetch(
+        `https://api.spotify.com/v1/search?q=${encodeURIComponent(
+          query
+        )}&type=track,album,artist&limit=10`,
+        {
+          headers: { Authorization: `Bearer ${accessToken}` },
+        }
+      );
+
+      if (!res.ok) throw new Error("Search failed");
+
+      const data = await res.json();
+      // console.log("Search results:", data);
+
+      // Flatten results → show albums + tracks
+      const combined = [
+        ...(data.tracks?.items || []),
+        ...(data.albums?.items || []),
+      ];
+
+      setSearchResults(combined);
+    } catch (err) {
+      console.error(err);
+    } finally {
+      setSearching(false);
+    }
+  };
+
   return (
     <div className="w-full h-full overflow-y-auto p-6">
+      {/* 🔍 Search box */}
       <header className="w-full flex items-center justify-center px-6">
-        <Searchbox />
+        <Searchbox onSearch={handleSearch} />
       </header>
 
-      <p
-        className="text-white text-lg p-4 font-bold"
-        onClick={() => {
-          fetchProfileButtonHandler();
-        }}
-      >
-        Genres
-      </p>
-      <div className="flex flex-wrap p-4 gap-4 mb-4">
-        {dummygenres.map((item, index) => (
-          <Genrecard key={index} title={item.title} />
-        ))}
-      </div>
+      {!isInitialized ? (
+        <div className="text-white text-center p-4">
+          <Spinner />
+        </div>
+      ) : (
+        <div>
+          {/* If searching → show results */}
+          {searching ? (
+            <div className="flex justify-center p-6">
+              <Spinner />
+            </div>
+          ) : searchResults.length > 0 ? (
+            <div>
+              <div className="justify-between flex flex-row w-full items-center">
+                <p className="text-white text-lg p-4 font-bold">
+                  Search Results
+                </p>
+                <button
+                  onClick={() => setSearchResults([])}
+                  className="text-sm bg-gray-700 h-fit hover:bg-gray-600 text-white px-3 py-1 rounded-md"
+                >
+                  Clear results
+                </button>
+              </div>
+              <div className="w-full p-4 grid grid-cols-1 md:grid-cols-2 gap-4">
+                {searchResults.map((item) => (
+                  <Musiccardsmall
+                    key={item.id}
+                    title={item.name}
+                    imageUrl={
+                      item.images?.[0]?.url ||
+                      item.album?.images?.[0]?.url ||
+                      ""
+                    }
+                  />
+                ))}
+              </div>
+            </div>
+          ) : (
+            <>
+              {/* Categories */}
+              <p className="text-white text-lg p-4 font-bold">Categories</p>
+              <div className="flex flex-wrap p-4 gap-4 mb-4">
+                {categories.length === 0 ? (
+                  <p className="text-gray-400">
+                    {!accessToken
+                      ? "Please log in to view categories"
+                      : "No categories available"}
+                  </p>
+                ) : (
+                  categories.map((item) => (
+                    <Musiccardsmall
+                      key={item.id}
+                      title={item.name}
+                      imageUrl={item.icons?.[0]?.url || ""}
+                      iscategory={true}
+                    />
+                  ))
+                )}
+              </div>
 
-      <p className="text-white text-lg p-4 font-bold">Browse All</p>
-      <div className="w-full  p-4 grid grid-cols-2 gap-4">
-        {dummydetails.map((item, index) => (
-          <Musiccardsmall
-            key={index}
-            title={item.title}
-            imageUrl={item.imageUrl}
-          />
-        ))}
-      </div>
+              {/* Genres */}
+              <p className="text-white text-lg p-4 font-bold">Genres</p>
+              <div className="flex flex-wrap p-4 gap-4 mb-4">
+                {dummygenres.map((item, index) => (
+                  <Genrecard key={index} title={item.title} />
+                ))}
+              </div>
+
+              {/* Recommended Albums */}
+              <p className="text-white text-lg p-4 font-bold">
+                Recommended Albums
+              </p>
+              <div className="w-full p-4 grid grid-cols-2 gap-4">
+                {recommendedalbums.length === 0 ? (
+                  <p className="text-gray-400">
+                    {!accessToken
+                      ? "Please log in to view recommendations"
+                      : "No albums found"}
+                  </p>
+                ) : (
+                  recommendedalbums.map((item) => (
+                    <Musiccardsmall
+                      key={item.id}
+                      title={item.name}
+                      imageUrl={item.images?.[0]?.url || ""}
+                    />
+                  ))
+                )}
+              </div>
+            </>
+          )}
+        </div>
+      )}
     </div>
   );
 };

@@ -4,6 +4,8 @@ import { Library, LucideLogOut, Search, Settings, XIcon } from "lucide-react";
 import Userheader from "./userheader";
 import { useLocation, useNavigate } from "react-router-dom";
 import { logout } from "../script";
+import { useSpotifyStore } from "../assets/store/store";
+import logo from "../assets/logo.svg";
 
 interface SidenavProps {
   onClose?: () => void;
@@ -13,6 +15,7 @@ interface SidenavProps {
 export const Sidenav = ({ onClose, isOpen = true }: SidenavProps) => {
   const navigate = useNavigate();
   const location = useLocation();
+  const { profile, accessToken, logout } = useSpotifyStore();
 
   const navlinks = [
     {
@@ -80,7 +83,14 @@ export const Sidenav = ({ onClose, isOpen = true }: SidenavProps) => {
               {/* Links */}
               <section className="flex flex-col h-full gap-3 lg:gap-2.5">
                 <div className="flex flex-col  h-full">
-                  <Userheader name="Ernest Junior" />
+                  <img
+                    src={logo}
+                    className="h-8 mb-20 cursor-pointer"
+                    onClick={() => {
+                      navigate("/search");
+                    }}
+                  />
+                  <Userheader name={profile?.display_name} />
                   {navlinks.map((item, index) => (
                     <div
                       onClick={() => handleNavClick(item.path)}
@@ -102,16 +112,12 @@ export const Sidenav = ({ onClose, isOpen = true }: SidenavProps) => {
                     </div>
                   ))}
                   <div className="h-full">
-                    <div
-                      className="flex h-full gap-1 items-end justify-center pb-10"
-                      onClick={() => {
-                        logout();
-                      }}
-                    >
+                    <div className="flex h-full gap-1 items-end justify-center pb-10">
                       <div
                         className="flex h-fit gap-1 items-center justify-center  rounded-full px-3 py-2 bg-black/50 cursor-pointer"
                         onClick={() => {
                           logout();
+                          navigate("/auth");
                         }}
                       >
                         <LucideLogOut className="text-white h-4" />
