@@ -7,7 +7,7 @@ export default defineConfig({
   plugins: [react(),tailwindcss()],
   server: {
     allowedHosts: [
-      'lenient-bengal-sharing.ngrok-free.app', 
+      'music-app-alx.vercel.app/', 
     ],
   },
 })

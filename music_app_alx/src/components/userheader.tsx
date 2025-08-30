@@ -7,7 +7,7 @@ interface UserheaderProps {
   imageUrl?: string;
 }
 
-const Userheader = ({ name, imageUrl }: UserheaderProps) => {
+const Userheader = ({ name }: UserheaderProps) => {
   const { profile, accessToken, logout } = useSpotifyStore();
   return (
     <div className="flex gap-5 items-center mb-10">

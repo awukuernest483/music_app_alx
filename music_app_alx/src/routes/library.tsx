@@ -3,11 +3,7 @@ import { useSpotifyStore } from "../assets/store/store";
 import AlbumCard from "../components/albumcard";
 import Spinner from "../components/spinner";
 
-const libraryitems = [
-  { id: 1, title: "Playlists" },
-  // { id: 2, title: "Artists" },
-  // { id: 3, title: "Albums" },
-];
+const libraryitems = [{ id: 1, title: "Playlists" }];
 
 const Library = () => {
   const { accessToken } = useSpotifyStore();
@@ -26,12 +22,6 @@ const Library = () => {
           case "Playlists":
             endpoint = "https://api.spotify.com/v1/me/playlists";
             break;
-            // case "Artists":
-            //   endpoint = "https://api.spotify.com/v1/me/following?type=artist";
-            //   break;
-            // case "Albums":
-            //   endpoint = "https://api.spotify.com/v1/me/albums";
-            break;
         }
 
         const res = await fetch(endpoint, {
@@ -41,14 +31,9 @@ const Library = () => {
 
         const json = await res.json();
 
-        // normalize results based on tab
         let results: any[] = [];
         if (activeTab === "Playlists") {
           results = json.items || [];
-        } else if (activeTab === "Artists") {
-          results = json.artists?.items || [];
-        } else if (activeTab === "Albums") {
-          results = json.items?.map((i: any) => i.album) || [];
         }
 
         setItems(results);

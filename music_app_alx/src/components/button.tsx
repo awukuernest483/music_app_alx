@@ -2,7 +2,7 @@ import React from "react";
 import spotifylogo from "../assets/spotifylogo.svg";
 
 interface ButtonProps {
-  onClick: () => void;
+  onClick?: (e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => void;
   text: string;
   type?: "button" | "submit" | "reset";
   color?: string;

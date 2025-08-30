@@ -29,9 +29,8 @@ const AuthPage = () => {
               textcolor="text-white"
               color="bg-[#1DB954]"
               text="Login with Spotify"
-              onClick={(e) => {
+              onClick={(e: any) => {
                 e.preventDefault();
-                console.log("cvldjfmld.");
                 spotifyLogin();
               }}
               type="submit"
