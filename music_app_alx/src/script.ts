@@ -1,7 +1,7 @@
 import { useSpotifyStore } from "./assets/store/store";
 
-const clientId = process.env.REACT_APP_SPOTIFY_CLIENT_ID;
-const redirectUri = process.env.REACT_APP_SPOTIFY_REDIRECT_URI;
+const clientId = process.env.CLIENT_ID;
+const redirectUri = process.env.SPOTIFY_REDIRECT_URI;
 
 // In-memory storage as fallback (for environments where localStorage isn't available)
 let memoryStorage = {};
