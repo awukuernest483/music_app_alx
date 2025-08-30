@@ -1,7 +1,8 @@
 import { useSpotifyStore } from "./assets/store/store";
 
-const clientId = import.meta.env.VITE_SPOTIFY_CLIENT_ID;
-const redirectUri = import.meta.env.VITE_SPOTIFY_REDIRECT_URI;
+const clientId = "941d6389eb244304b5fc2fb75fdf4131";
+// Update this to your current ngrok URL or permanent domain
+const redirectUri = "https://lenient-bengal-sharing.ngrok-free.app/search";
 
 // In-memory storage as fallback (for environments where localStorage isn't available)
 let memoryStorage = {};
